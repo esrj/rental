@@ -55,19 +55,19 @@ const DailyRental = sequelize.define('Daily',{
         values: ['Cash', 'ATM', 'Linepay'],
         allowNull: false,
         unique:false,
-        default:'Cash'
+        defaultValue:'Cash'
     },
-    isPay:{type: Sequelize.BOOLEAN,default: false,unique:false},
-    isLent:{type: Sequelize.BOOLEAN,default: false,unique:false},
-    isReturn:{type: Sequelize.BOOLEAN,default: false,unique:false},
+    isPay:{type: Sequelize.BOOLEAN,defaultValue: false,unique:false},
+    isLent:{type: Sequelize.BOOLEAN,defaultValue: false,unique:false},
+    isReturn:{type: Sequelize.BOOLEAN,defaultValue:  false,unique:false},
     feedback:{type: Sequelize.STRING,allowNull:  false,unique:false,default:''},
-    price:{type: Sequelize.INTEGER,default: 0,unique:false},
+    price:{type: Sequelize.INTEGER,defaultValue: 0,unique:false},
     classify: {
         type: Sequelize.ENUM,
         values: ['day', 'Month'],
         allowNull: false,
         unique:false,
-        default:'day'
+        defaultValue:'day'
     },
 })
 

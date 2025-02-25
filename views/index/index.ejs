@@ -10,6 +10,32 @@
         transform: scale(1.08); /* 放大图片 */
         transition: transform 0.5s ease;
     }
+    .picture{
+        height: 180px;
+        object-fit: cover;
+        width: 100%;
+
+    }
+    @media (max-width: 1199px) {
+        .picture{
+            height: 150px;
+        }
+    }
+    @media (max-width: 991px) {
+        .picture{
+            height: 180px;
+        }
+    }
+    @media (max-width: 576px) {
+        .picture{
+            height: 250px;
+        }
+    }
+    @media (max-width: 420px) {
+        .picture{
+            height: 180px;
+        }
+    }
     .form-control{
         border-radius: 0;
     }
@@ -46,8 +72,8 @@
             </select>
         </div>
         <div>
-            <div style="display: flex;flex-direction: row;justify-content: space-around;align-items: center;">
-                <div style="width: 100%;margin: 10px">
+            <div class="row" style="padding: 13px">
+                <div style="padding: 10px" class="col-sm-6">
                     <p>選擇取車時間</p>
                     <div style="display: flex">
                         <input style="height: 42px;margin-right: 5px" class="form-control"  type="date" id="rental_date" name="date">
@@ -84,7 +110,7 @@
                     </div>
                 </div>
 
-                <div style="width: 100%;margin: 10px">
+                <div style="padding: 10px" class="col-sm-6">
                     <p>選擇還車時間</p>
                     <div style="display: flex">
                         <input style="height: 42px;margin-right: 5px" class="form-control" type="date" id="return_date" name="date">
@@ -144,7 +170,7 @@
 
         <div style="   margin-top: 25px; display: flex;align-items: center;">
             <input id="input_comment" style="margin: 0;border: 1px solid black;border-top: 0;border-right:0;border-left: 0 " placeholder="新增你的留言" class="form-control">
-            <button onclick="submit_comment()" style="border-radius: 25px;width: 100px ;color: #515151;background-color: #ececec;border-color: #ffffff;" class="btn btn-secondary">確認送出</button>
+            <button onclick="submit_comment()" style="border-radius: 25px;width: 120px ;color: #515151;background-color: #ececec;border-color: #ffffff;" class="btn btn-secondary">確認送出</button>
         </div>
 
         <div id="comment">
@@ -264,7 +290,9 @@
                 var date2 = new Date($('#return_date').val()+$('#return_time').val()); // 假設另一個日期是 2024-05-20
                 var timeDifference = date2 - date1;
                 var dayDifference = timeDifference / (1000 * 60 * 60 * 24);
-                axios.post('/').then(res=>{
+                axios.post('/',{
+                    vehicle:vehicle
+                }).then(res=>{
                     if(res.data.errno === 0){
                         swal({
                             'title':'已傳送',
@@ -285,6 +313,7 @@
                         const queryString = new URLSearchParams(data).toString();
                         window.location.href = `/order?${queryString}`;
                     }else{
+                        console.log(res.data)
                         swal({
                             'title':'請先登入',
                             'text':'登入後才能繼續以下動作',

@@ -1,8 +1,9 @@
 const {User} = require('../model/user')
 const sequelize = require('../util/database')
+const { Op } = require('sequelize');
 
 
-const login = (req, res, next) => {
+const login= (req, res, next) => {
     if(req.session.isLogin === true){
         res.redirect('/')
     }else{
@@ -26,11 +27,10 @@ const login = (req, res, next) => {
                 res.send({'errno':1})
             })
         }
-
     }
 }
 
-const register = (req, res, next) => {
+const register = async (req, res, next) => {
     if(req.session.isLogin === true){
         res.redirect('/')
     }else{
@@ -44,8 +44,19 @@ const register = (req, res, next) => {
             const country= req.body['country']
             const birthday= req.body['birthday']
             const phone= req.body['phone']
-            sequelize.sync().then(() => {
-                User.create({
+
+            const user = await User.findOne({
+                where: {
+                    [Op.or]: [
+                        { email: email },
+                        { identity: identity }
+                    ]
+                }
+            })
+            if(user){
+                res.send({'errno':1})
+            }else{
+                await User.create({
                     name :name,
                     password: password,
                     identity:identity,
@@ -53,10 +64,9 @@ const register = (req, res, next) => {
                     country:country,
                     birthday:birthday,
                     phone:phone,
-                }).then(()=>{
-                    res.send({'errno':0})
                 })
-            })
+                res.send({'errno':0})
+            }
         }
     }
 }

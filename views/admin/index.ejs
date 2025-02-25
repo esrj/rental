@@ -50,14 +50,14 @@
                 <tbody>
                     <% for(let order of orders){ %>
                         <tr>
-                            <th scope="col"><%= order.User.name %></th>
-                            <th scope="col"><%= order.Vehicle.license_plate %></th>
-                            <th scope="col"><%= order.payment_method %></th>
+                            <th onclick="direct('<%=order.id%>')"  scope="col"><%= order.User.name %></th>
+                            <th onclick="direct('<%=order.id%>')" scope="col"><%= order.Vehicle.license_plate %></th>
+                            <th onclick="direct('<%=order.id%>')" scope="col"><%= order.payment_method %></th>
                             <% if ( order.isPay ){%>
                                 <th scope="col">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value=""  checked>
-                                        <label class="form-check-label" for="flexCheckChecked">
+                                        <input onclick="notPay('<%=order.id%>')" class="form-check-input" type="checkbox" value=""  checked>
+                                        <label  class="form-check-label" for="flexCheckChecked">
                                             Pay
                                         </label>
                                     </div>
@@ -65,8 +65,8 @@
                             <%}else{%>
                                 <th scope="col">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" >
-                                        <label class="form-check-label" for="flexCheckDefault">
+                                        <input onclick=isPay('<%=order.id%>') class="form-check-input" type="checkbox" value="" >
+                                        <label  class="form-check-label" >
                                             Pay
                                         </label>
                                     </div>
@@ -75,17 +75,17 @@
                             <% if ( order.isReturn ){%>
                                 <th scope="col">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" checked>
-                                        <label class="form-check-label" for="flexCheckChecked">
-                                            Checked checkbox
+                                        <input onclick="notReturn('<%=order.id%>')" class="form-check-input" type="checkbox" value=""  checked>
+                                        <label class="form-check-label" >
+                                            Return
                                         </label>
                                     </div>
                                 </th>
                             <%}else{%>
                                 <th scope="col">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" >
-                                        <label class="form-check-label" for="flexCheckDefault">
+                                        <input onclick="isReturn('<%=order.id%>')" class="form-check-input" type="checkbox" value="" >
+                                        <label class="form-check-label" >
                                             Return
                                         </label>
                                     </div>
@@ -101,3 +101,36 @@
     </div>
 </main>
 <%- include('../components/footer.ejs') %>
+<script>
+    function isReturn(id){
+        axios.post('/admin/',{
+            type:'isReturn',
+            id:Number(id)
+        })
+    }
+    function notReturn(id){
+        axios.post('/admin/',{
+            type:'notReturn',
+            id:Number(id)
+        })
+    }
+
+    function isPay(id){
+        axios.post('/admin/',{
+            type:'isPay',
+            id:Number(id)
+        })
+    }
+
+    function notPay(id){
+        axios.post('/admin/',{
+            type:'notPay',
+            id:Number(id)
+        })
+    }
+
+    function direct(id){
+        window.location.href=`/admin/single/${id}`
+    }
+
+</script>

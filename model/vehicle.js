@@ -30,8 +30,8 @@ const Vehicle = sequelize.define('Vehicle',{
     image: {type: Sequelize.STRING,allowNull:  false,unique:false},
     introduction : {type: Sequelize.STRING,allowNull:  false,unique:false},
     license_plate: {type: Sequelize.STRING,allowNull:  false, unique: true},
-    price :{type:Sequelize.INTEGER ,allowNull:  false, unique: true,default:0},
-    subscription :{type:Sequelize.INTEGER ,allowNull:  false, unique: true,default:0},
+    price :{type:Sequelize.INTEGER ,allowNull:  false, unique: false,default:0},
+    subscription :{type:Sequelize.INTEGER ,allowNull:  false, unique: false,default:0},
     brandId: {
         type: Sequelize.INTEGER,
         allowNull: false,

@@ -8,10 +8,10 @@ const isAuth = (req,res,next)=>{
 
 const isAdmin = (req,res,next)=>{
     if(!req.session.isLogin){
-        return res.redirect('/admin/login')
+        return res.redirect('/login')
     }else{
-        if(req.user.permission === 1){
-            return res.redirect('/admin/login')
+        if(req.user.permission === "1" || req.user.permission === 1){
+            return res.redirect('/login')
         }
     }
     next()

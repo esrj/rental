@@ -2,10 +2,50 @@ const {Brand,Vehicle} = require('../model/vehicle')
 const Place = require('../model/place')
 const {DailyRental,Subscription} = require('../model/order')
 const {User,Comment} = require('../model/user')
+const {isOverlapping} = require('../util/checkDate')
+
 const index = (req, res, next) => {
     if(req.method === 'POST'){
         if(req.session.isLogin){
-            res.send({errno:0})
+
+            if(req.body['single'] === true) {
+                DailyRental.findAll({
+                    include: [
+                        {model: Vehicle}
+                    ],
+                    order: [
+                        ['rental_time', 'DESC']
+                    ]
+                }).then(orders => {
+                    if (orders) {
+
+                        for (const order of orders) {
+                            if(Number(req.body['vehicle']) === order.Vehicle.id){
+                                const return_date = new Date(req.body['start'])
+                                const currentMonth = return_date.getMonth();
+                                return_date.setMonth(currentMonth + 1);
+                                if (order.classify === 'day') {
+                                    if (isOverlapping(req.body['start'], return_date, order.rental_time, order.return_time)) {
+                                        res.send({'errno': 2})
+                                        return
+                                    }
+                                } else {
+                                    const end = new Date(order.rental_time)
+                                    const currentMonth = end.getMonth();
+                                    end.setMonth(currentMonth + 1);
+                                    if (isOverlapping(req.body['start'], return_date, order.rental_time, end)) {
+                                        res.send({'errno': 2})
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return res.send({errno: 0})
+                })
+            }else{
+                return res.send({errno: 0})
+            }
         }else{
             res.send({errno:1})
         }
@@ -24,6 +64,8 @@ const index = (req, res, next) => {
     }
 }
 
+
+
 const brand = (req, res, next) => {
     Brand.findAll().then(brands=>{
         return res.send({'brands':brands})
@@ -36,7 +78,7 @@ const place = (req, res, next) => {
     })
 }
 
-const vehicle = (req,res,next) =>{
+const vehicle =  (req,res,next) =>{
     const query = req.query['type']
     const type = {
         'car': "經濟轎車",
@@ -50,7 +92,7 @@ const vehicle = (req,res,next) =>{
         Vehicle.findAll().then(vehicles => {
             vehicles.forEach(item => {
                 item.type = type[item.type]
-                item.image = item.image.replace("public/", "");
+                item.image = item.image.replace("public", "");
                 item.introduction = item.introduction.substring(0, 25) + "...."
             })
             if (req.method === "GET") {
@@ -68,14 +110,72 @@ const vehicle = (req,res,next) =>{
             } else {
                 if (req.body['filter'] === true){
 
-                    vehicles = vehicles.filter(item => {
-                        return (req.body['brand'] === '不限'  || item.brandId === Number(req.body['brand']) ) && (req.body['type'] === '不限' || item.type === type[req.body['type']]) && (req.body['low_price'] === '' || item.subscription > Number(req.body['low_price']) )&& ( req.body['high_price'] === '' || item.subscription < Number(req.body['high_price']))
-                    });
+                    let remove_list = []
+                    DailyRental.findAll({
+                        include: [
+                            {model: Vehicle}
+                        ],
+                        order: [
+                            ['rental_time', 'DESC']
+                        ]
+                    }).then(orders=>{
+                        orders.forEach(order=>{
+                            const return_date = new Date(req.body['start'])
+                            const currentMonth = return_date.getMonth();
+                            return_date.setMonth(currentMonth + 1);
+                            if(order.classify === 'day'){
+                                if(isOverlapping(req.body['start'],return_date,order.rental_time,order.return_time)){
+                                    remove_list.push(order.Vehicle.id)
+                                }
+                            }else{
 
-                    res.send({'vehicles': vehicles})
+                                const end = new Date(order.rental_time)
+                                const currentMonth = end.getMonth();
+                                end.setMonth(currentMonth + 1);
+                                if(isOverlapping(req.body['start'],return_date,order.rental_time,end)){
+                                    remove_list.push(order.Vehicle.id)
+                                }
+                            }
+                        })
+                        let  updatedVehicles = vehicles.filter(item => !remove_list.includes(item.id));
+
+                        updatedVehicles = updatedVehicles.filter(item => {
+                            return (req.body['brand'] === '不限'  || item.brandId === Number(req.body['brand']) ) && (req.body['type'] === '不限' || item.type === type[req.body['type']]) && (req.body['low_price'] === '' || item.subscription > Number(req.body['low_price']) )&& ( req.body['high_price'] === '' || item.subscription < Number(req.body['high_price']))
+                        });
+
+                        res.send({'vehicles': updatedVehicles})
+                    })
+
+
+
                 }else{
-                    res.send({'vehicles': vehicles})
 
+                    let remove_list = []
+                    DailyRental.findAll({
+                        include: [
+                            {model: Vehicle}
+                        ],
+                        order: [
+                            ['rental_time', 'DESC']
+                        ]
+                    }).then(orders=>{
+                        orders.forEach(order=>{
+                            if(order.classify === 'day'){
+                                if(isOverlapping(req.body['start'],req.body['end'],order.rental_time,order.return_time)){
+                                    remove_list.push(order.Vehicle.id)
+                                }
+                            }else{
+                                const end = new Date(order.rental_time)
+                                const currentMonth = end.getMonth();
+                                end.setMonth(currentMonth + 1);
+                                if(isOverlapping(req.body['start'],req.body['end'],order.rental_time,end)){
+                                    remove_list.push(order.Vehicle.id)
+                                }
+                            }
+                        })
+                        const updatedVehicles = vehicles.filter(item => !remove_list.includes(item.id));
+                        res.send({'vehicles': updatedVehicles})
+                    })
                 }
             }
         })
@@ -83,7 +183,7 @@ const vehicle = (req,res,next) =>{
         Vehicle.findAll({where:{type:query}}).then((vehicles)=>{
             vehicles.forEach(item => {
                 item.type = type[item.type]
-                item.image = item.image.replace("public/", "");
+                item.image = item.image.replace("public", "");
                 item.introduction = item.introduction.substring(0, 25) + "...."
             })
             if (req.session.isLogin) {
@@ -106,7 +206,7 @@ const single = (req,res,next) =>{
     const id = req.params['id']
     Vehicle.findOne({where:{"id":id}}).then(vehicle=>{
         vehicle.type = type[vehicle.type]
-        vehicle.image = vehicle.image.replace("public/", "");
+        vehicle.image = vehicle.image.replace("public", "");
         Brand.findOne({where:{"id":vehicle.brandId}}).then(brand=>{
             if(req.session.isLogin){
                 res.render('index/single',{
@@ -162,7 +262,7 @@ const order = async (req, res, next) => {
                 return_date:return_date.replace('T'," ").replace('+08:00',""),
                 dayDifference: time,
                 type:type[vehicle.type],
-                image:vehicle.image.replace("public/", "")
+                image:vehicle.image.replace("public", "")
             });
         } else {
             if(req.body['classify'] === 'day'){
@@ -175,10 +275,12 @@ const order = async (req, res, next) => {
                     'price':req.body['price'],
                     'user':req.user.id,
                     "payment_method":req.body['payment_method'],
-                    "classify":"day"
+                    "classify":"day",
+                    "feedback":''
                 }).then(()=>{
                     res.send({'errno':0})
                 }).catch(e=>{
+                    console.log(e)
                     res.send({'errno':1})
                 })
             }else{
@@ -190,7 +292,8 @@ const order = async (req, res, next) => {
                     'price':req.body['price'],
                     'user':req.user.id,
                     "payment_method":req.body['payment_method'],
-                    "classify":'Month'
+                    "classify":'Month',
+                    "feedback":''
                 }).then(()=>{
                     res.send({'errno':0})
                 }).catch(e=>{
@@ -224,6 +327,9 @@ const profile = async (req,res,next) =>{
         });
         const history = []
         for(let item of dailyRentals){
+
+            // console.log(item.isPay)
+            console.log("isreturn ",item.isReturn)
             if((Date.now() > item.return_time && item.classify === 'day')|| (item.classify === 'Month' && item.isReturn === true)){
                 history.push(item)
             }
@@ -233,13 +339,14 @@ const profile = async (req,res,next) =>{
             item.return_point = await Place.findOne({where:{id:item.return_point}})
             item.rental_time_ = await  formatter.format(item.rental_time).replace(',', '');
             item.return_time_ = await  formatter.format(item.return_time).replace(',', '');
-            if(item.isPay ===false){
+            // console.log(item.isPay)
+            if(item.isPay === false){
                 item.status = '尚未付款'
             }else{
-                if(item.isLent === false){
-                    item.status = '尚未提車'
-                }else{
+                if(item.isReturn === false){
                     item.status = '尚未還車'
+                }else{
+                    item.status = '已歸還車量'
                 }
             }
         }
@@ -269,7 +376,6 @@ const comment = async (req,res,next)=>{
         }
     }else if(req.method === 'PATCH'){
         const comments = await Comment.findAll({
-
             include: [
                 {
                     model: User,
@@ -279,12 +385,8 @@ const comment = async (req,res,next)=>{
                 ['id', 'DESC']
             ]
         });
-
-
         res.send({'comments':comments})
-
     }
-
 }
 
 

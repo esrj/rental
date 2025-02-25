@@ -16,6 +16,7 @@
     .switch{
         text-decoration: none
     }
+
     @media (max-width: 1600px) {
         .single{
             padding: 35px
@@ -36,7 +37,7 @@
 <div class="container">
     <div class="row" style="margin-top: 50px">
         <div class="col-lg-6 single" >
-            <img class="img" src="/<%= vehicle.image %>">
+            <img class="img" src="<%= vehicle.image %>">
         </div>
         <div class="col-lg-6 single" >
             <h2 style="color: #101737"><%= vehicle.name %></h2>
@@ -89,8 +90,8 @@
             </select>
         </div>
         <div>
-            <div style="display: flex;flex-direction: row;justify-content: space-around;align-items: center;">
-                <div style="width: 100%;margin: 10px">
+            <div class="row" style="padding: 13px">
+                <div style="padding: 10px" class="col-sm-6">
                     <p>選擇取車時間</p>
                     <div style="display: flex">
                         <input style="height: 42px;margin-right: 5px" class="form-control"  type="date" id="rental_date" name="date">
@@ -127,7 +128,7 @@
                     </div>
                 </div>
 
-                <div style="width: 100%;margin: 10px">
+                <div style="padding: 10px" class="col-sm-6">
                     <p>選擇還車時間</p>
                     <div style="display: flex">
                         <input style="height: 42px;margin-right: 5px" class="form-control" type="date" id="return_date" name="date">
@@ -238,7 +239,12 @@
                 var date2 = new Date($('#return_date').val()+$('#return_time').val()); // 假設另一個日期是 2024-05-20
                 var timeDifference = date2 - date1;
                 var dayDifference = timeDifference / (1000 * 60 * 60 * 24);
-                axios.post('/').then(res=>{
+                axios.post('/',{
+                    'single':true,
+                    'vehicle':'<%= id %>',
+                    'start':date1,
+                    'end':date2
+                }).then(res=>{
                     if(res.data.errno === 0){
                         swal({
                             'title':'已傳送',
@@ -257,7 +263,17 @@
                             'classify':'day'
                         }
                         const queryString = new URLSearchParams(data).toString();
-                        window.location.href = `/order?${queryString}`;
+                        setTimeout(()=>{
+                            window.location.href = `/order?${queryString}`;
+                        },1000)
+                    }else if(res.data.errno === 2){
+                        swal({
+                            'title':'提示',
+                            'text':'此日期已經有其他用戶租借了',
+                            'icon':'warning',
+                            'buttons':false,
+                            'timer':2000
+                        })
                     }else{
                         swal({
                             'title':'請先登入',
@@ -293,7 +309,11 @@
                     'timer':2000
                 })
             }else{
-                axios.post('/').then(res=>{
+                axios.post('/',{
+                    'single':true,
+                    'vehicle':'<%= id %>',
+                    'start':rental_date
+                }).then(res=>{
                     if(res.data.errno === 0){
                         swal({
                             'title':'已傳送',
@@ -309,11 +329,21 @@
                             'classify':'month'
                         }
                         const queryString = new URLSearchParams(data).toString();
-                        window.location.href = `/order?${queryString}`;
-                    }else{
+                        setTimeout(()=>{
+                            window.location.href = `/order?${queryString}`;
+                        },1000)
+                    }else if(res.data.errno === 1){
                         swal({
                             'title':'請先登入',
                             'text':'登入後才能繼續以下動作',
+                            'icon':'warning',
+                            'buttons':false,
+                            'timer':2000
+                        })
+                    }else if(res.data.errno === 2){
+                        swal({
+                            'title':'資料錯誤',
+                            'text':'租借日期已經過期',
                             'icon':'warning',
                             'buttons':false,
                             'timer':2000

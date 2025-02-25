@@ -27,5 +27,11 @@ router.patch('/place',isAdmin, adminController.place);
 
 router.get('/bill',isAdmin, adminController.bill);
 
+router.get('/single/:id',isAdmin, adminController.single);
+
+router.get('/calendar/:id',isAdmin, adminController.calendar);
+router.post('/calendar/:id',isAdmin, adminController.calendar);
+
+
 
 module.exports = router;

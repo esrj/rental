@@ -14,86 +14,68 @@
     }
 
 
-    .container_nav_left{
-        margin-left: 120px
-    }
-    .container_nav_right{
-        margin-right: 120px
-    }
+
     .dropdown-menu {
 
         min-width: 6rem;
 
     }
 
-    @media (max-width: 1320px) {
-        .container_nav_left{
-            margin-left: 80px
-        }
-        .container_nav_right{
-            margin-right: 80px
-        }
-    }
-    @media (max-width: 991px) {
-        .container_nav_left{
-            margin-left: 50px
-        }
-        .container_nav_right{
-            margin-right: 50px
-        }
-        .cellphone{
-            display: none;
-        }
-    }
-    @media (max-width: 600px) {
-        .container_nav_left{
-            margin-left: 35px
-        }
 
+    @media (max-width: 991px) {
+
+        .d-flex{
+            display: block !important;
+        }
     }
+
 </style>
 <body>
-<nav  class=" navbar navbar-expand-lg navbar-light bg-light" style="height: 75px;background-color: white !important;box-shadow: 0px 1px 2px #dbdbdb;">
-    <div class="container-fluid">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="/">文宏租車</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <a  class="navbar-brand container_nav_left" href="/">文宏租車</a>
-        <div style="    display: flex;align-items: center;" >
-            <a style="color: #181819;" class="nav-link cellphone" href="/" id="navbarDropdown" role="button" data-bs-toggle="dropdown" >
-                主頁
-            </a>
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 cellphone">
-                <li class="nav-item dropdown">
-                    <a style="color: #181819;" class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" >
-                        車款介紹
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="/vehicle">所有車款</a></li>
-                        <li><a class="dropdown-item" href="/vehicle?type=car">經濟轎車</a></li>
-                        <li><a class="dropdown-item" href="/vehicle?type=Luxury_car">豪華轎車</a></li>
-                        <li><a class="dropdown-item" href="/vehicle?type=RV">休旅車</a></li>
-                        <li><a class="dropdown-item" href="/vehicle?type=boxcar">廂型車</a></li>
-                        <li><a class="dropdown-item" href="/vehicle?type=motorcycle">機車</a></li>
-                        <li><a class="dropdown-item" href="/vehicle?type=truck">貨車</a></li>
-                    </ul>
-                </li>
-            </ul>
-            <ul  class="navbar-nav me-auto mb-2 mb-lg-0 cellphone">
-                <li  class="container_nav_right nav-item dropdown container_nav_right">
-                    <a style="color: #181819;"  class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" >
-                        <img style="height: 42px" src="/images/user.png">
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                        <% if(isAuthenticated){ %>
-                            <li><a class="dropdown-item" href="/logout">登出</a></li>
-                            <li><a class="dropdown-item" href="/profile"><%=user.name%></a></li>
-                        <% }else{ %>
-                            <li><a class="dropdown-item" href="/login">登入</a></li>
-                            <li><a class="dropdown-item" href="/register">註冊</a></li>
-                        <% } %>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent" style="justify-content: flex-end;">
 
-                    </ul>
-                </li>
-            </ul>
+            <div class="d-flex" style="align-items: center;">
+                <a style="color: #181819;text-decoration: none" class="navbar-nav me-auto mb-2 mb-lg-0" href="/"   >主頁</a>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                    <li class="nav-item dropdown">
+                                        <a style="color: #181819;" class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" >
+                                            車款介紹
+                                        </a>
+                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <li><a class="dropdown-item" href="/vehicle">所有車款</a></li>
+                                            <li><a class="dropdown-item" href="/vehicle?type=car">經濟轎車</a></li>
+                                            <li><a class="dropdown-item" href="/vehicle?type=Luxury_car">豪華轎車</a></li>
+                                            <li><a class="dropdown-item" href="/vehicle?type=RV">休旅車</a></li>
+                                            <li><a class="dropdown-item" href="/vehicle?type=boxcar">廂型車</a></li>
+                                            <li><a class="dropdown-item" href="/vehicle?type=motorcycle">機車</a></li>
+                                            <li><a class="dropdown-item" href="/vehicle?type=truck">貨車</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <ul  class="navbar-nav me-auto mb-2 mb-lg-0">
+                                    <li  class="container_nav_right nav-item dropdown container_nav_right">
+                                        <a style="color: #181819;"  class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" >
+                                            <img style="height: 42px" src="/images/user.png">
+                                        </a>
+                                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                                            <% if(isAuthenticated){ %>
+                                                <li><a class="dropdown-item" href="/logout">登出</a></li>
+                                                <li><a class="dropdown-item" href="/profile"><%=user.name%></a></li>
+                                            <% }else{ %>
+                                                <li><a class="dropdown-item" href="/login">登入</a></li>
+                                                <li><a class="dropdown-item" href="/register">註冊</a></li>
+                                            <% } %>
+
+                                        </ul>
+                                    </li>
+                                </ul>
+            </div>
         </div>
     </div>
 </nav>

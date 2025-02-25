@@ -8,10 +8,10 @@ const Place = sequelize.define('Place',{
         allowNull:false,
         primaryKey: true,
     },
-    name: {type: Sequelize.STRING,allowNull:  false, unique:true},
+    name: {type: Sequelize.STRING,allowNull:  false, unique:false},
     address : {type: Sequelize.STRING,allowNull:  false, unique:true},
-    area : {type: Sequelize.STRING,allowNull:  false, unique:true},
-    city : {type: Sequelize.STRING,allowNull:  false, unique:true},
+    area : {type: Sequelize.STRING,allowNull:  false, unique:false},
+    city : {type: Sequelize.STRING,allowNull:  false, unique:false},
 }, {
     sequelize,
     modelName: 'Place'

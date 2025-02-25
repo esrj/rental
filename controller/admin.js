@@ -4,10 +4,13 @@ const Place = require('../model/place')
 const sequelize = require('../util/database')
 const {where} = require("sequelize");
 const {DailyRental} = require('../model/order')
+const moment = require('moment');
+const {order} = require("./index");
+
 
 const login = (req, res, next) => {
     if(req.session.isLogin === true){
-        res.redirect('/admim/')
+        res.redirect('/admin/')
     }else{
         if(req.method  === 'GET'){
             res.render('admin/login');
@@ -36,28 +39,42 @@ const login = (req, res, next) => {
     }
 }
 const index = async (req, res, next) => {
-    if(!req.session.isLogin){
-        res.redirect('/admin/login')
+    if(!req.session.isLogin || req.session.user.permission === "1"){
+        res.redirect('/login')
     }else{
         if(req.method === 'GET'){
             const orders = await DailyRental.findAll({
                 include: [
-                    {
-                        model: User,
-                    },
-                    {
-                        model: Vehicle,
-                    }
+                    {model: User,},
+                    {model: Vehicle,}
                 ],
                 order: [
                     ['rental_time', 'DESC']
                 ]
             });
-
             res.render('admin/index',{
                 'user':req.user,
                 'orders':orders
             })
+        }else{
+            if(req.body['type'] === 'isReturn' ){
+                const order = await DailyRental.findOne({where:{id:req.body['id']}})
+                order.isReturn = true
+                await order.save()
+            }else if(req.body['type'] === 'notReturn' ){
+                const order = await DailyRental.findOne({where:{id:req.body['id']}})
+                order.isReturn = false
+                await order.save()
+            }else if(req.body['type'] === 'isPay' ){
+                const order = await DailyRental.findOne({where:{id:req.body['id']}})
+                order.isPay = true
+                await order.save()
+            }else if(req.body['type'] === 'notPay' ){
+                const order = await DailyRental.findOne({where:{id:req.body['id']}})
+                order.isPay = false
+                await order.save()
+            }
+            res.send('success')
         }
     }
 }
@@ -117,7 +134,7 @@ const vehicle = (req, res, next) => {
                 const typeId = req.body['type']
                 Vehicle.create({
                     'brandId': req.body['brand'],
-                    'image': req.file.path,
+                    'image': req.file.path.replace('public',''),
                     'name': req.body['name'],
                     'age': Number(req.body['age']),
                     'type': type[typeId],
@@ -178,16 +195,98 @@ const place = (req, res, next) => {
         }
     }
 }
-const bill = (req, res, next) => {
+const bill = async (req, res, next) => {
     if(!req.session.isLogin){
         res.redirect('/admin/login')
     }else{
+        const bill = {}
+        const orders = await  DailyRental.findAll()
+        orders.forEach(item=>{
+            const dateObj = moment(item.rental_time)
+            const month = dateObj.month() + 1;
+            if(bill[month]){
+                bill[month] += item.price
+            }else{
+                bill[month] = item.price
+            }
+        })
+        const arr = []
+        for (const key in bill) {
+            arr.push({
+                month:key,
+                price:bill[key]
+            })
+        }
         res.render('admin/bill',{
-            user:req.user
+            user:req.user,
+            arr:arr,
         })
     }
 }
 
 
+const single= async (req, res, next) => {
+    if(!req.session.isLogin){
+        res.redirect('/admin/login')
+    }else{
+        const order = await DailyRental.findOne({
+            where:{id:req.params['id']},
+            include: [
+                {model: User,},
+                {model: Vehicle,}
+            ],
+            order: [
+                ['rental_time', 'DESC']
+            ]
+        });
+        res.render('admin/single',{
+            user:req.user,
+            order:order
+        })
+    }
+}
 
-module.exports = {login,index,brand,place,vehicle,bill}
+
+const calendar = async  (req, res, next) => {
+    if(!req.session.isLogin){
+        res.redirect('/admin/login')
+    }else{
+
+        const orders = await DailyRental.findAll({
+            include: [
+                {model: Vehicle}
+            ],
+            order: [
+                ['rental_time', 'DESC']
+            ]
+        });
+        if(req.method ==='GET'){
+            res.render('admin/calendar',{
+                'user':req.user,
+
+            })
+        }else{
+            const daily = []
+            const Month = []
+            orders.forEach(item=>{
+                if(item.Vehicle.id === Number(req.params['id'])){
+                    if(item.classify === 'Month'){
+                        Month.push(item.rental_time)
+                    }else{
+                        daily.push({
+                            start:item.rental_time,
+                            end:item.return_time
+                        })
+                    }
+                }
+            })
+            res.send({
+                'daily':daily,
+                'Month':Month
+            })
+        }
+    }
+}
+
+
+module.exports = {login,index,brand,place,vehicle,bill,single,calendar}

@@ -11,6 +11,9 @@
         transform: scale(1.08);
         transition: transform 0.5s ease;
     }
+    .picture {
+        width: 100%;
+    }
 </style>
 <link rel="stylesheet" href="/css/vehicle.css" >
 <div class="background-container">
@@ -36,7 +39,7 @@
                 <div class="col-lg-3 col-md-4 col-sm-6" style="margin-top: 25px">
                     <div  class="card vehicle" >
                         <a href="/single/<%= vehicle.id %>">
-                            <img class="picture" src="/<%= vehicle.image %>">
+                            <img class="picture" src="<%= vehicle.image %>">
                         </a>
                         <div style="padding: 20px">
                             <a style="text-decoration: none" href="/single/<%= vehicle.id %>">

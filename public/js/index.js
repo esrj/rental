@@ -35,15 +35,35 @@ function load_place(){
 }
 load_place()
 
+
+// 選取車輛
 function select(){
-    axios.post('/vehicle',{
-        "filter":false
-    }).then(res=>{
-        res.data.vehicles.forEach(item=>{
-            $('#vehicle').append($(`
+
+    if($('#rental_date').val() === '' || $('#rental_date').val() === ''){
+        swal({
+            'title':'請先確認時間',
+            'text':'請輸入取還車時間'   ,
+            'icon':'warning',
+            'timer':1500
+        })
+    }else {
+        swal({
+            'title':'請稍候',
+            'text':'正在查詢剩餘車輛'   ,
+            'icon':'success',
+            'timer':1500,
+            'buttons':false
+        })
+        axios.post('/vehicle', {
+            "filter": false,
+            'start': $('#rental_date').val(),
+            'end': $('#return_date').val()
+        }).then(res => {
+            res.data.vehicles.forEach(item => {
+                $('#vehicle').append($(`
                 <div class="col-lg-3 col-sm-4 col-sm-6">
                     <div  class="card vehicle" style="margin: 10px">
-                        <img class="picture" src="/${item.image}">
+                        <img class="picture" src="${item.image.replace('/public/','')}">
                         <div style="padding: 20px">
                             <h5 style="color: #101737">${item.name}</h5>
                             <p style="margin-bottom: 2px;color: #ababab">${item.type}</p>
@@ -56,34 +76,51 @@ function select(){
                     </div>
                 </div>
             `))
+            })
         })
-    })
-    $("#select").empty()
+        $("#select").empty()
 
-    $("#rent").append($(`
+        $("#rent").append($(`
             <a  style="height: 42px;margin: 10px" onclick="rent()"  class="btn btn-primary">我要租車</a>
-    `))
+        `))
+    }
 }
 
-function select_sub(){
 
-    const brand = $("#brand").val()
-    const type = $("#type").val()
-    console.log(type)
-    const low_price = $("#low_price").val()
-    const high_price = $("#high_price").val()
-    axios.post('/vehicle',{
-        'filter':true,
-        'brand':brand,
-        'type':type,
-        'low_price':low_price,
-        'high_price':high_price,
-    }).then(res=>{
-        res.data.vehicles.forEach(item=>{
-            $('#vehicle').append($(`
+// 選擇車輛
+function select_sub(){
+    if($('#rental_date').val() === '' || $('#rental_date').val() === ''){
+        swal({
+            'title':'請先確認時間',
+            'text':'請輸入取還車時間'   ,
+            'icon':'warning',
+            'timer':1500
+        })
+    }else {
+        swal({
+            'title':'請稍候',
+            'text':'正在查詢剩餘車輛'   ,
+            'icon':'success',
+            'timer':1500,
+            'buttons':false
+        })
+        const brand = $("#brand").val()
+        const type = $("#type").val()
+        const low_price = $("#low_price").val()
+        const high_price = $("#high_price").val()
+        axios.post('/vehicle', {
+            'filter': true,
+            'brand': brand,
+            'type': type,
+            'low_price': low_price,
+            'high_price': high_price,
+            'start': $('#rental_date').val(),
+        }).then(res => {
+            res.data.vehicles.forEach(item => {
+                $('#vehicle').append($(`
                 <div class="col-lg-3 col-sm-4 col-sm-6">
                     <div  class="card vehicle" style="margin: 10px">
-                        <img class="picture" src="/${item.image}">
+                        <img class="picture" src="${item.image}">
                         <div style="padding: 20px">
                             <h5 style="color: #101737">${item.name}</h5>
                             <p style="margin-bottom: 2px;color: #ababab">${item.type}</p>
@@ -96,13 +133,14 @@ function select_sub(){
                     </div>
                 </div>
             `))
+            })
         })
-    })
-    $("#select").empty()
+        $("#select").empty()
 
-    $("#rent").append($(`
+        $("#rent").append($(`
             <a  style="height: 42px;margin: 10px" onclick="rent_sub()"  class="btn btn-primary">我要租車</a>
-    `))
+        `))
+    }
 }
 
 
@@ -152,17 +190,17 @@ function daily(){
             <p>選擇取還車地點</p>
             <select style="height: 42px" class="form-select" id="rental_place">
                 <option >選擇取還車地點</option>
-                
+
             </select>
         </div>
         <div>
-            <div style="display: flex;flex-direction: row;justify-content: space-around;align-items: center;">
-                <div style="width: 100%;margin: 10px">
+            <div class="row" style="padding: 13px">
+                <div style="padding: 10px" class="col-sm-6">
                     <p>選擇取車時間</p>
                     <div style="display: flex">
-                        <input style="height: 42px;margin-right: 5px" class="form-control" type="date" id="rental_date" name="date">
+                        <input style="height: 42px;margin-right: 5px" class="form-control"  type="date" id="rental_date" name="date">
 
-                        <select style="height: 42px;margin-left: 5px" class="form-select" id="rental_time" aria-label="Default select example">
+                        <select style="height: 42px;margin-left: 5px" id="rental_time" class="form-select" aria-label="Default select example">
                             <option >選擇時間</option>
                             <option value="T08:00:00+08:00">8:00</option>
                             <option value="T08:30:00+08:00">8:30</option>
@@ -194,7 +232,7 @@ function daily(){
                     </div>
                 </div>
 
-                <div style="width: 100%;margin: 10px">
+                <div style="padding: 10px" class="col-sm-6">
                     <p>選擇還車時間</p>
                     <div style="display: flex">
                         <input style="height: 42px;margin-right: 5px" class="form-control" type="date" id="return_date" name="date">
@@ -245,9 +283,10 @@ function daily(){
         <div id="vehicle" class="row">
 
         </div>
-        <div id="rent" style="display: contents;">
+        <div id="rent" style="display: contents">
         </div>
-        `))
+
+    `))
     $('#daily').removeClass('btn_color')
     $('#contract').removeClass('btn_color');
     $('#daily').addClass('btn_color')

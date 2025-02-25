@@ -81,17 +81,17 @@ function daily(){
             <p>選擇取還車地點</p>
             <select style="height: 42px" class="form-select" id="rental_place">
                 <option >選擇取還車地點</option>
-                
+
             </select>
         </div>
         <div>
-            <div style="display: flex;flex-direction: row;justify-content: space-around;align-items: center;">
-                <div style="width: 100%;margin: 10px">
+            <div class="row" style="padding: 13px">
+                <div style="padding: 10px" class="col-sm-6">
                     <p>選擇取車時間</p>
                     <div style="display: flex">
-                        <input style="height: 42px;margin-right: 5px" class="form-control" type="date" id="rental_date" name="date">
+                        <input style="height: 42px;margin-right: 5px" class="form-control"  type="date" id="rental_date" name="date">
 
-                        <select style="height: 42px;margin-left: 5px" class="form-select" id="rental_time" aria-label="Default select example">
+                        <select style="height: 42px;margin-left: 5px" id="rental_time" class="form-select" aria-label="Default select example">
                             <option >選擇時間</option>
                             <option value="T08:00:00+08:00">8:00</option>
                             <option value="T08:30:00+08:00">8:30</option>
@@ -123,7 +123,7 @@ function daily(){
                     </div>
                 </div>
 
-                <div style="width: 100%;margin: 10px">
+                <div style="padding: 10px" class="col-sm-6">
                     <p>選擇還車時間</p>
                     <div style="display: flex">
                         <input style="height: 42px;margin-right: 5px" class="form-control" type="date" id="return_date" name="date">
@@ -167,8 +167,9 @@ function daily(){
                 </label>
             </div>
         </div>
-        <a style="width: 100%;height: 42px;margin: 10px" onclick="rent()" class="btn btn-primary">我要租車</a>
-        `))
+        <a style="width: 100%;height: 42px;margin: 10px" onclick="rent()"  class="btn btn-primary">我要租車</a>
+
+    `))
     $('#daily').removeClass('btn_color')
     $('#contract').removeClass('btn_color');
     $('#daily').addClass('btn_color')

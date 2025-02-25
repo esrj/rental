@@ -50,18 +50,16 @@
                 </thead>
                 <tbody>
                 <% for(let daily of dailyRental) {%>
-                    <% if(daily.classify === 'Month'){ %>
-                        <% if(daily.isReturn === false){ %>
-                            <tr>
-                                <td><%=daily.vehicle.name%></td>
-                                <td><%=daily.vehicle.license_plate%></td>
-                                <td><%=daily.rental_time_ %></td>
-                                <td>尚未還車</td>
-                                <td><%=daily.price%></td>
-                                <td><%=daily.classify%></td>
-                                <td><%=daily.status%></td>
-                            </tr>
-                        <% }%>
+                    <% if(daily.classify == 'Month'){ %>
+                    <tr>
+                        <td><%=daily.vehicle.name%></td>
+                        <td><%=daily.vehicle.license_plate%></td>
+                        <td><%=daily.rental_time_ %></td>
+                        <td>訂閱車時限為一個月</td>
+                        <td><%=daily.price%></td>
+                        <td><%=daily.classify%></td>
+                        <td><%=daily.status%></td>
+                    </tr>
                     <% }else{%>
                         <tr>
                             <td><%=daily.vehicle.name%></td>
@@ -110,7 +108,6 @@
                         </td>
                     </tr>
                     <% }) %>
-
 
                 </tbody>
             </table>
